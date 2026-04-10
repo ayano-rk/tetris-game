@@ -104,7 +104,7 @@
 
         .next-block-box {
             background: linear-gradient(135deg, #fff5e6 0%, #ffe8f0 100%);
-            padding: 15px;
+            padding: 20px;
             border-radius: 15px;
             border: 4px solid #ffb6d9;
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
@@ -112,20 +112,20 @@
         }
 
         .next-block-title {
-            font-size: 0.75em;
+            font-size: 0.9em;
             color: #c2569a;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 700;
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         #next-canvas {
-            border: 3px solid #ffb6d9;
+            border: 4px solid #ffb6d9;
             border-radius: 10px;
             background-color: #fff;
             display: block;
             margin: 0 auto;
+            box-shadow: inset 0 0 0 2px #ffc0e0;
         }
 
         .button-group {
@@ -143,9 +143,8 @@
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Noto Sans JP', sans-serif;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            text-transform: uppercase;
             letter-spacing: 1px;
         }
 
@@ -278,7 +277,7 @@
 <body>
 
     <h1>🧩 テトリス 🧩</h1>
-    <div class="subtitle">ブロックをそろえてスコアを稼ごう！</div>
+    <div class="subtitle">ブロックをそろえてとくてんをかせごう！</div>
 
     <div id="game-wrapper">
         <div class="game-section">
@@ -288,36 +287,36 @@
         
         <div id="side-panel">
             <div class="info-box">
-                <div class="info-title">📊 スコア</div>
+                <div class="info-title">📊 とくてん</div>
                 <div id="score" class="info-value">0</div>
             </div>
 
             <div class="info-box">
-                <div class="info-title">⚡ レベル</div>
+                <div class="info-title">⚡ むずかしさ</div>
                 <div id="level" class="info-value">1</div>
             </div>
 
             <div class="info-box">
-                <div class="info-title">🏆 ハイスコア</div>
+                <div class="info-title">🏆 さいこうきろく</div>
                 <div id="high-score" class="info-value">0</div>
             </div>
 
             <div class="next-block-box">
                 <div class="next-block-title">⏭️ つぎのブロック</div>
-                <canvas id="next-canvas" width="80" height="80"></canvas>
+                <canvas id="next-canvas" width="100" height="100"></canvas>
             </div>
 
             <div class="button-group">
-                <button id="start-btn">▶ スタート</button>
-                <button id="pause-btn" disabled>⏸ 一時停止</button>
+                <button id="start-btn">▶ はじめる</button>
+                <button id="pause-btn" disabled>⏸ ひとやすみ</button>
             </div>
 
             <div id="controls">
-                <span class="controls-title">🎮 操作方法</span>
-                <span class="key">←</span> <span class="key">→</span> : 移動<br>
-                <span class="key">↑</span> : 回転<br>
-                <span class="key">↓</span> : 高速落下<br>
-                <span class="key">Space</span> : 一気に落下
+                <span class="controls-title">🎮 あそびかた</span>
+                <span class="key">←</span> <span class="key">→</span> : うごかす<br>
+                <span class="key">↑</span> : まわす<br>
+                <span class="key">↓</span> : はやくおとす<br>
+                <span class="key">Space</span> : いっきにおとす
             </div>
         </div>
     </div>
@@ -342,7 +341,7 @@
         const pauseBtn = document.getElementById('pause-btn');
 
         context.scale(20, 20);
-        nextContext.scale(10, 10);
+        nextContext.scale(12.5, 12.5);
 
         let gameRunning = false;
         let gamePaused = false;
@@ -375,7 +374,7 @@
             if (!gameRunning) {
                 statusElement.innerHTML = '';
             } else if (gamePaused) {
-                statusElement.innerHTML = '<div class="paused-message">⏸ 一時停止中</div>';
+                statusElement.innerHTML = '<div class="paused-message">⏸ ひとやすみちゅう</div>';
             } else {
                 statusElement.innerHTML = '';
             }
@@ -398,7 +397,7 @@
         pauseBtn.addEventListener('click', () => {
             if (gameRunning) {
                 gamePaused = !gamePaused;
-                pauseBtn.textContent = gamePaused ? '▶ 再開' : '⏸ 一時停止';
+                pauseBtn.textContent = gamePaused ? '▶ つづける' : '⏸ ひとやすみ';
                 updateGameStatus();
                 playSound(659, 0.1); // ミ
                 if (!gamePaused) {
@@ -413,8 +412,8 @@
             gamePaused = false;
             startBtn.disabled = false;
             pauseBtn.disabled = true;
-            pauseBtn.textContent = '⏸ 一時停止';
-            statusElement.innerHTML = '<div class="game-over-message">💥 ゲームオーバー！</div>';
+            pauseBtn.textContent = '⏸ ひとやすみ';
+            statusElement.innerHTML = '<div class="game-over-message">💥 ゲームおーばー！</div>';
             playSound(262, 0.3); // ド（低い）
             
             // ハイスコアを更新
@@ -542,7 +541,11 @@
         function drawNextBlock() {
             nextContext.fillStyle = '#fff';
             nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-            drawMatrix(player.nextMatrix, {x: 2, y: 1});
+            
+            // ネクストブロックを中央に表示
+            const offsetX = (8 - player.nextMatrix[0].length) / 2;
+            const offsetY = (8 - player.nextMatrix.length) / 2;
+            drawMatrixNext(player.nextMatrix, {x: offsetX, y: offsetY});
         }
 
         // ブロックの色（可愛らしいパステルカラー）
@@ -594,6 +597,46 @@
                         context.moveTo(posX, posY + 1);
                         context.lineTo(posX + 1, posY + 1);
                         context.stroke();
+                    }
+                });
+            });
+        }
+
+        // ネクストキャンバス用の描画
+        function drawMatrixNext(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        const posX = x + offset.x;
+                        const posY = y + offset.y;
+
+                        nextContext.fillStyle = colors[value];
+                        nextContext.fillRect(posX, posY, 1, 1);
+
+                        // ネクストブロックにも3D効果を付与
+                        nextContext.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                        nextContext.lineWidth = 0.1;
+                        nextContext.beginPath();
+                        nextContext.moveTo(posX, posY);
+                        nextContext.lineTo(posX + 1, posY);
+                        nextContext.stroke();
+
+                        nextContext.beginPath();
+                        nextContext.moveTo(posX, posY);
+                        nextContext.lineTo(posX, posY + 1);
+                        nextContext.stroke();
+
+                        nextContext.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                        nextContext.lineWidth = 0.1;
+                        nextContext.beginPath();
+                        nextContext.moveTo(posX + 1, posY);
+                        nextContext.lineTo(posX + 1, posY + 1);
+                        nextContext.stroke();
+
+                        nextContext.beginPath();
+                        nextContext.moveTo(posX, posY + 1);
+                        nextContext.lineTo(posX + 1, posY + 1);
+                        nextContext.stroke();
                     }
                 });
             });
