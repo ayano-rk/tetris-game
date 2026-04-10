@@ -3,99 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Tetris</title>
+    <title>🧩 かわいいテトリス</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #202028;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd6e8 0%, #c2e9ff 50%, #ffe8d6 100%);
+            color: #5a3a5a;
+            font-family: 'Fredoka', 'Noto Sans JP', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
         }
 
-        #game-container {
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px rgba(255, 255, 255, 0.7);
+            color: #ff69b4;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            color: #8b5a8b;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        #game-wrapper {
             display: flex;
-            gap: 20px;
+            gap: 30px;
             align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .game-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
         }
 
         canvas {
-            border: 4px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            background-color: #000;
+            border: 8px solid #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 0 3px #ffc0e0;
+            background-color: #fff8f0;
+            display: block;
         }
 
         #side-panel {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            min-width: 220px;
         }
 
         .info-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            min-width: 150px;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe8f0 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border: 4px solid #ffb6d9;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+            text-align: center;
         }
 
         .info-title {
-            font-size: 0.8em;
-            color: #aaa;
-            margin-bottom: 5px;
+            font-size: 0.75em;
+            color: #c2569a;
+            margin-bottom: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .info-value {
-            font-size: 1.5em;
-            font-weight: bold;
+            font-size: 2em;
+            font-weight: 700;
+            color: #ff69b4;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+        }
+
+        .next-block-box {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe8f0 100%);
+            padding: 15px;
+            border-radius: 15px;
+            border: 4px solid #ffb6d9;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+            text-align: center;
+        }
+
+        .next-block-title {
+            font-size: 0.75em;
+            color: #c2569a;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #next-canvas {
+            border: 3px solid #ffb6d9;
+            border-radius: 10px;
+            background-color: #fff;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #start-btn {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: #fff;
+        }
+
+        #start-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        #start-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        #start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #pause-btn {
+            background: linear-gradient(135deg, #87ceeb 0%, #4169e1 100%);
+            color: #fff;
+        }
+
+        #pause-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(65, 105, 225, 0.4);
+        }
+
+        #pause-btn:active:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        #pause-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         #controls {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #ccc;
-            line-height: 1.6;
-            background: rgba(0, 0, 0, 0.3);
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #5a3a5a;
+            line-height: 1.8;
+            background: rgba(255, 255, 255, 0.8);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
+            border: 3px dashed #ffb6d9;
         }
 
         .key {
             display: inline-block;
-            background: #444;
-            padding: 2px 8px;
-            border-radius: 4px;
-            border-bottom: 2px solid #222;
+            background: linear-gradient(135deg, #ffe8d6 0%, #ffd6e8 100%);
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: 2px solid #ffb6d9;
             margin: 0 2px;
-            font-family: monospace;
+            font-family: 'Fredoka', monospace;
+            font-weight: 600;
+            color: #c2569a;
         }
 
-        h1 {
-            margin-bottom: 10px;
-            letter-spacing: 5px;
-            text-transform: uppercase;
+        .controls-title {
+            font-weight: 700;
+            color: #ff69b4;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        #game-status {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #ff69b4;
+            text-align: center;
+            min-height: 30px;
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
+        }
+
+        .game-over-message {
+            color: #ff1493;
+            font-size: 1.3em;
+            animation: pulse 0.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .paused-message {
+            color: #4169e1;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            #game-wrapper {
+                gap: 20px;
+            }
+
+            canvas {
+                border: 6px solid #fff;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+
+            .info-value {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>TETRIS</h1>
+    <h1>🧩 かわいいテトリス 🧩</h1>
+    <div class="subtitle">ブロックをそろえてスコアを稼ごう！</div>
 
-    <div id="game-container">
-        <canvas id="tetris" width="240" height="400"></canvas>
+    <div id="game-wrapper">
+        <div class="game-section">
+            <canvas id="tetris" width="240" height="400"></canvas>
+            <div id="game-status"></div>
+        </div>
         
         <div id="side-panel">
             <div class="info-box">
-                <div class="info-title">SCORE</div>
+                <div class="info-title">📊 スコア</div>
                 <div id="score" class="info-value">0</div>
             </div>
-            
+
+            <div class="info-box">
+                <div class="info-title">⚡ レベル</div>
+                <div id="level" class="info-value">1</div>
+            </div>
+
+            <div class="next-block-box">
+                <div class="next-block-title">⏭️ つぎのブロック</div>
+                <canvas id="next-canvas" width="80" height="80"></canvas>
+            </div>
+
+            <div class="button-group">
+                <button id="start-btn">▶ スタート</button>
+                <button id="pause-btn" disabled>⏸ 一時停止</button>
+            </div>
+
             <div id="controls">
-                <strong>操作方法:</strong><br>
+                <span class="controls-title">🎮 操作方法</span>
                 <span class="key">←</span> <span class="key">→</span> : 移動<br>
                 <span class="key">↑</span> : 回転<br>
                 <span class="key">↓</span> : 高速落下<br>
@@ -107,9 +304,64 @@
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('next-canvas');
+        const nextContext = nextCanvas.getContext('2d');
         const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const statusElement = document.getElementById('game-status');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
 
         context.scale(20, 20);
+        nextContext.scale(10, 10);
+
+        let gameRunning = false;
+        let gamePaused = false;
+
+        // ゲーム状態の管理
+        function updateGameStatus() {
+            if (!gameRunning) {
+                statusElement.innerHTML = '';
+            } else if (gamePaused) {
+                statusElement.innerHTML = '<div class="paused-message">⏸ 一時停止中</div>';
+            } else {
+                statusElement.innerHTML = '';
+            }
+        }
+
+        // スタートボタンのクリック
+        startBtn.addEventListener('click', () => {
+            if (!gameRunning) {
+                gameRunning = true;
+                gamePaused = false;
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                updateGameStatus();
+                update();
+            }
+        });
+
+        // 一時停止ボタンのクリック
+        pauseBtn.addEventListener('click', () => {
+            if (gameRunning) {
+                gamePaused = !gamePaused;
+                pauseBtn.textContent = gamePaused ? '▶ 再開' : '⏸ 一時停止';
+                updateGameStatus();
+                if (!gamePaused) {
+                    update();
+                }
+            }
+        });
+
+        // ゲームオーバー時の処理
+        function gameOver() {
+            gameRunning = false;
+            gamePaused = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            pauseBtn.textContent = '⏸ 一時停止';
+            statusElement.innerHTML = '<div class="game-over-message">💥 ゲームオーバー！</div>';
+        }
 
         // ライン消去時のスコア計算
         function arenaSweep() {
@@ -125,7 +377,7 @@
                 arena.unshift(row);
                 ++y;
 
-                player.score += rowCount * 10;
+                player.score += rowCount * 100;
                 rowCount *= 2;
             }
             updateScore();
@@ -145,7 +397,7 @@
             return false;
         }
 
-        // マトリックス（盤面やブロック）の作成
+        // マトリックスの作成
         function createMatrix(w, h) {
             const matrix = [];
             while (h--) {
@@ -154,7 +406,7 @@
             return matrix;
         }
 
-        // テトリミノ（ブロック）の形状定義
+        // テトリミノの形状定義
         function createPiece(type) {
             if (type === 'T') {
                 return [
@@ -203,36 +455,88 @@
 
         // 描画処理
         function draw() {
-            context.fillStyle = '#000';
+            context.fillStyle = '#fff8f0';
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             drawMatrix(arena, {x: 0, y: 0});
             drawMatrix(player.matrix, player.pos);
         }
 
+        // ネクストブロックの描画
+        function drawNextBlock() {
+            nextContext.fillStyle = '#fff';
+            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            drawMatrix(player.nextMatrix, {x: 2, y: 1});
+        }
+
+        // ブロックの色（可愛らしいパステルカラー）
         const colors = [
             null,
-            '#FF0D72', // T
-            '#0DC2FF', // O
-            '#0DFF72', // L
-            '#F538FF', // J
-            '#FF8E0D', // I
-            '#FFE138', // S
-            '#3877FF', // Z
+            '#ff69b4', // T - ピンク
+            '#ffd700', // O - ゴールド
+            '#00d4ff', // L - シアン
+            '#ff6ec7', // J - ホットピンク
+            '#00ff88', // I - ライムグリーン
+            '#ffb347', // S - ライトオレンジ
+            '#da70d6', // Z - オーキッド
         ];
 
+        // レンガのようなテクスチャを描画
         function drawMatrix(matrix, offset) {
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
+                        const posX = x + offset.x;
+                        const posY = y + offset.y;
+
+                        // メインのブロック色
                         context.fillStyle = colors[value];
-                        context.fillRect(x + offset.x,
-                                         y + offset.y,
-                                         1, 1);
-                        // ブロックの縁取り
-                        context.strokeStyle = 'rgba(255,255,255,0.1)';
-                        context.lineWidth = 0.05;
-                        context.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                        context.fillRect(posX, posY, 1, 1);
+
+                        // レンガのような3D効果（明るい上辺）
+                        context.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                        context.lineWidth = 0.08;
+                        context.beginPath();
+                        context.moveTo(posX, posY);
+                        context.lineTo(posX + 1, posY);
+                        context.stroke();
+
+                        context.beginPath();
+                        context.moveTo(posX, posY);
+                        context.lineTo(posX, posY + 1);
+                        context.stroke();
+
+                        // レンガのような3D効果（暗い下辺）
+                        context.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                        context.lineWidth = 0.08;
+                        context.beginPath();
+                        context.moveTo(posX + 1, posY);
+                        context.lineTo(posX + 1, posY + 1);
+                        context.stroke();
+
+                        context.beginPath();
+                        context.moveTo(posX, posY + 1);
+                        context.lineTo(posX + 1, posY + 1);
+                        context.stroke();
+                    }
+                });
+            });
+        }
+
+        // ネクストキャンバス用の描画（小さいサイズ対応）
+        function drawMatrixNext(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        const posX = x + offset.x;
+                        const posY = y + offset.y;
+
+                        nextContext.fillStyle = colors[value];
+                        nextContext.fillRect(posX, posY, 1, 1);
+
+                        nextContext.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                        nextContext.lineWidth = 0.1;
+                        nextContext.strokeRect(posX, posY, 1, 1);
                     }
                 });
             });
@@ -306,14 +610,16 @@
         // 新しいブロックの生成
         function playerReset() {
             const pieces = 'TJLOSZI';
-            player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+            player.matrix = player.nextMatrix;
+            player.nextMatrix = createPiece(pieces[pieces.length * Math.random() | 0]);
             player.pos.y = 0;
             player.pos.x = (arena[0].length / 2 | 0) -
                            (player.matrix[0].length / 2 | 0);
+            
+            drawNextBlock();
+
             if (collide(arena, player)) {
-                arena.forEach(row => row.fill(0));
-                player.score = 0;
-                updateScore();
+                gameOver();
             }
         }
 
@@ -333,11 +639,29 @@
             }
         }
 
+        // スコア更新とレベル計算
+        function updateScore() {
+            scoreElement.innerText = player.score;
+            const newLevel = Math.floor(player.score / 500) + 1;
+            if (newLevel !== player.level) {
+                player.level = newLevel;
+                levelElement.innerText = player.level;
+                dropInterval = Math.max(200, 1000 - (player.level - 1) * 100);
+            }
+        }
+
         let dropCounter = 0;
         let dropInterval = 1000;
-
         let lastTime = 0;
+
         function update(time = 0) {
+            if (!gameRunning || gamePaused) {
+                if (gameRunning && gamePaused) {
+                    requestAnimationFrame(update);
+                }
+                return;
+            }
+
             const deltaTime = time - lastTime;
 
             dropCounter += deltaTime;
@@ -351,20 +675,20 @@
             requestAnimationFrame(update);
         }
 
-        function updateScore() {
-            scoreElement.innerText = player.score;
-        }
-
         const arena = createMatrix(12, 20);
 
         const player = {
             pos: {x: 0, y: 0},
             matrix: null,
+            nextMatrix: null,
             score: 0,
+            level: 1,
         };
 
         // キー入力イベント
         document.addEventListener('keydown', event => {
+            if (!gameRunning || gamePaused) return;
+
             if (event.keyCode === 37) {
                 playerMove(-1);
             } else if (event.keyCode === 39) {
@@ -374,13 +698,17 @@
             } else if (event.keyCode === 38) {
                 playerRotate(1);
             } else if (event.keyCode === 32) {
+                event.preventDefault();
                 playerHardDrop();
             }
         });
 
+        // 初期化
+        player.nextMatrix = createPiece('T');
         playerReset();
         updateScore();
-        update();
+        draw();
+        drawNextBlock();
     </script>
 </body>
 </html>
